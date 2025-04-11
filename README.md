@@ -4,7 +4,6 @@
 	- b. Filtering the Files
 	- c. Combine the File Content
  	- d. Decode the file
-  - e. Password Check
 - Soal 2
 	- a. Download dan Unzip 
  	- b. x
