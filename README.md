@@ -69,7 +69,7 @@ Kemudian ```execve("/usr/bin/curl", curl_argv, NULL);``` digunakan untuk menjala
 ```
 Untuk soal ini saya menggunakan code `unzip` yang terletak di `usr/bin/unzip` pada linux. Hasil extrak akan disimpan pada folder dengan file Clues.zip. `execve("/usr/bin/unzip", unzip_argv, NULL);` execve ini digunakan untuk menjalankan code tersebut. `perror("Gagal menjalankan unzip");` akan berjalan ketika file gagal di ekstrak.
 
-### remove Clues.zip
+### Remove Clues.zip
 ```
     char *rm_argv[] = {
             "/usr/bin/rm",
@@ -230,3 +230,5 @@ if (argc == 3 && strcmp(argv[1], "-m") == 0) {
 Code berikut digunakan untuk menjalankan program filter dengan `-m Combine`.
 
 ## d. Decode the file
+
+## Error Handling
