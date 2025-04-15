@@ -230,5 +230,44 @@ if (argc == 3 && strcmp(argv[1], "-m") == 0) {
 Code berikut digunakan untuk menjalankan program filter dengan `-m Combine`.
 
 ## d. Decode the file
+```
+char rot13(char c) {
+    if (c >= 'a' && c <= 'z') return ((c - 'a' + 13) % 26) + 'a';
+    if (c >= 'A' && c <= 'Z') return ((c - 'A' + 13) % 26) + 'A';
+    return c;
+}
+```
+Code berikut berfungsi untuk mengubah isi dari Combined.txt dengan rot13 menjadi Password untuk masuk kedalam Lokasi dengan cara mengubah isi dari Combined.txt untuk setiap karakter ditambah 13 kemudian modulus 26 kemudian ditambah huruf awalnya.
+
+```
+void decode() {
+    FILE *input = fopen("Combined.txt", "r");
+    FILE *output = fopen("Decoded.txt", "w");
+```
+Code ini berfungsi untuk membuka file Combined.txt sebagai input, kemudian sebagai output dimasukkan dalam file Decoded.txt
+
+```
+if (input && output) {
+        char ch;
+        while ((ch = fgetc(input)) != EOF) {
+            fputc(rot13(ch), output);
+```
+Code ini akan dijalankan setelah input dan output dibuka. Code akan membaca tiap karakter dari isi file Combined.txt kemudian mengubahnya dengan function rot13 dan dituliskan hasilnya kedalam Decoded.txt.
+
+```
+fclose(input);
+fclose(output);
+```
+Menutup file input dan output.
+
+```
+if (argc == 3 && strcmp(argv[1], "-m") == 0) {
+    ...
+    else if (strcmp(argv[2], "Decode") == 0) {
+        combine();
+    }
+}
+```
+Code berikut digunakan untuk menjalankan program filter dengan `-m Decode`.
 
 ## Error Handling
