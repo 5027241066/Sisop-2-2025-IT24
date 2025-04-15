@@ -270,4 +270,9 @@ if (argc == 3 && strcmp(argv[1], "-m") == 0) {
 ```
 Code berikut digunakan untuk menjalankan program filter dengan `-m Decode`.
 
+## e. Password Check
+Setelah mendapatkan hasil dari Decoded.txt, selanjutnya output dimasukkan kedalam Lokasi Password Check dan hasilnya sebagai berikut.
+![image](https://github.com/user-attachments/assets/64b30716-0f6d-41e1-9595-bfb2d40b7522)
+
+
 ## Error Handling
