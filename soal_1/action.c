@@ -149,49 +149,55 @@ void decode() {
 
 int main(int argc, char *argv[]) {
     int status;
-    pid_t pid1 = fork();
-    if (pid1 == 0) {
-        char *curl_argv[] = {
-            "/usr/bin/curl",
-            "-L",
-            "-o",
-            "Clues.zip",
-            "https://drive.usercontent.google.com/u/0/uc?id=1xFn1OBJUuSdnApDseEczKhtNzyGekauK&export=download",
-            NULL
-        };
-        execve("/usr/bin/curl", curl_argv, NULL);
-        perror("Gagal menjalankan curl");
-        exit(1);
-    }
-    waitpid(pid1, &status, 0);
 
-    pid_t pid2 = fork();
-    if (pid2 == 0) {
-        char *unzip_argv[] = {
-            "/usr/bin/unzip",
-            "-o",
-            "Clues.zip",
-            NULL
-        };
-        execve("/usr/bin/unzip", unzip_argv, NULL);
-        perror("Gagal menjalankan unzip");
-        exit(1);
-    }
-    waitpid(pid2, &status, 0);
+    DIR *cek = opendir("Clues");
+    if (cek != NULL) {
+        closedir(cek);
+    } else {
+        pid_t pid1 = fork();
+        if (pid1 == 0) {
+            char *curl_argv[] = {
+                "/usr/bin/curl",
+                "-L",
+                "-o",
+                "Clues.zip",
+                "https://drive.usercontent.google.com/u/0/uc?id=1xFn1OBJUuSdnApDseEczKhtNzyGekauK&export=download",
+                NULL
+            };
+            execve("/usr/bin/curl", curl_argv, NULL);
+            perror("Gagal menjalankan curl");
+            exit(1);
+        }
+        waitpid(pid1, &status, 0);
 
-    pid_t pid3 = fork();
-    if (pid3 == 0) {
-        char *rm_argv[] = {
-            "/usr/bin/rm",
-            "-f",
-            "Clues.zip",
-            NULL
-        };
-        execve("/usr/bin/rm", rm_argv, NULL);
-        perror("Gagal remove");
-        exit(1);
+        pid_t pid2 = fork();
+        if (pid2 == 0) {
+            char *unzip_argv[] = {
+                "/usr/bin/unzip",
+                "-o",
+                "Clues.zip",
+                NULL
+            };
+            execve("/usr/bin/unzip", unzip_argv, NULL);
+            perror("Gagal menjalankan unzip");
+            exit(1);
+        }
+        waitpid(pid2, &status, 0);
+
+        pid_t pid3 = fork();
+        if (pid3 == 0) {
+            char *rm_argv[] = {
+                "/usr/bin/rm",
+                "-f",
+                "Clues.zip",
+                NULL
+            };
+            execve("/usr/bin/rm", rm_argv, NULL);
+            perror("Gagal remove");
+            exit(1);
+        }
+        waitpid(pid3, &status, 0);
     }
-    waitpid(pid3, &status, 0);
 
     if (argc == 3 && strcmp(argv[1], "-m") == 0) {
         if (strcmp(argv[2], "Filter") == 0) {
@@ -200,7 +206,11 @@ int main(int argc, char *argv[]) {
             combine();
         } else if (strcmp(argv[2], "Decode") == 0) {
             decode();
+        } else {
+            printf("Command tidak tersedia\n");
         }
+    } else if (argc > 1) {
+        printf("Command tidak tersedia\n");
     }
     return 0;
 }
