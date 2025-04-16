@@ -276,3 +276,24 @@ Setelah mendapatkan hasil dari Decoded.txt, selanjutnya output dimasukkan kedala
 
 
 ## Error Handling
+
+## Revisi
+### Download
+Dengan menggunakan code if-else untuk memeriksa directory, file tidak akan terdownload kembali setiap dijalankan
+```
+DIR *cek = opendir("Clues");
+    if (cek != NULL) {
+        closedir(cek);
+    } else {
+```
+
+### Unavailable Command
+Dengan menggunakan if-else, ketika dijalankan command selain Filter, Combine, dan Decode maka akan muncul message "Command tidak tersedia"
+```
+else {
+            printf("Command tidak tersedia\n");
+        }
+    } else if (argc > 1) {
+        printf("Command tidak tersedia\n");
+    }
+```
