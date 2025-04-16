@@ -20,12 +20,12 @@
   - g. x
   - h. x 
 - Soal 4
-	- a. x
- 	- b. x
-  	- c. x
-  	- d. x
-  	- e. x
-  	- f. x
+	- a. Mengetahui semua aktivitas user
+ 	- b. Memasang mata-mata dalam mode daemon
+  	- c. Menghentikan pengawasan
+  	- d. Menggagalkan semua proses user yang sedang berjalan
+  	- e. Mengizinkan user untuk kembali menjalankan proses
+  	- f. Mencatat ke dalam file log
 
 # Soal 1
 ## a. Downloading the Clues
@@ -297,3 +297,56 @@ else {
         printf("Command tidak tersedia\n");
     }
 ```
+
+
+# Soal 4 
+Suatu hari, Nobita menemukan sebuah alat aneh di laci mejanya. Alat ini berbentuk robot kecil dengan mata besar yang selalu berkedip-kedip. Doraemon berkata, "Ini adalah Debugmon! Robot super kepo yang bisa memantau semua aktivitas di komputer!" Namun, alat ini harus digunakan dengan hati-hati. Jika dipakai sembarangan, bisa-bisa komputer Nobita malah error total! 
+## a. Mengetahui semua aktivitas user
+Doraemon ingin melihat apa saja yang sedang dijalankan user di komputernya. Maka, dia mengetik:
+`./debugmon list <user>`
+. Debugmon langsung menampilkan daftar semua proses yang sedang berjalan pada user tersebut beserta PID, command, CPU usage, dan memory usage.
+
+```
+else if (strcmp(argv[1], "list") == 0) {
+    pid_t pid = fork();
+    if (pid == 0) {
+        char *args[] = {
+            "ps", "-u", argv[2],
+            "-o", "pid,comm,%cpu,%mem",
+            "--no-headers", NULL
+        };
+        execvp("ps", args);
+        perror("Failed to exec ps");
+        exit(1);
+    } else if (pid < 0) {
+        perror("Failed to fork for ps");
+    }
+    wait(NULL);
+    write_custom_log("list", "RUNNING");
+}
+```
+- 
+
+## b. Memasang mata-mata dalam mode daemon
+Doraemon ingin agar Debugmon terus memantau user secara otomatis. Doraemon pun menjalankan program ini secara daemon dan melakukan pencatatan ke dalam file log dengan menjalankan:
+`./debugmon daemon <user>`
+
+## c. Menghentikan pengawasan
+User mulai panik karena setiap gerak-geriknya diawasi! Dia pun memohon pada Doraemon untuk menghentikannya dengan:
+`./debugmon stop <user>`
+
+## d. Menggagalkan semua proses user yang sedang berjalan
+Doraemon yang iseng ingin mengerjai user dengan mengetik:
+`./debugmon fail <user>`
+. Debugmon langsung menggagalkan semua proses yang sedang berjalan dan menulis status proses ke dalam file log dengan status FAILED. Selain menggagalkan, user juga tidak bisa menjalankan proses lain dalam mode ini.
+
+## e. Mengizinkan user untuk kembali menjalankan proses
+Karena kasihan, Shizuka meminta Doraemon untuk memperbaiki semuanya. Doraemon pun menjalankan:
+`./debugmon revert <user>`
+. Debugmon kembali ke mode normal dan bisa menjalankan proses lain seperti biasa.
+
+## f. Mencatat ke dalam file log
+Sebagai dokumentasi untuk mengetahui apa saja yang debugmon lakukan di komputer user, debugmon melakukan pencatatan dan penyimpanan ke dalam file debugmon.log untuk semua proses yang dijalankan dengan format
+[dd:mm:yyyy]-[hh:mm:ss]_nama-process_STATUS(RUNNING/FAILED)
+Untuk poin b, c, dan e, status proses adalah RUNNING. Sedangkan untuk poin d, status proses adalah FAILED.
+
