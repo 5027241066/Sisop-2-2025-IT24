@@ -433,6 +433,8 @@ else if (strcmp(argv[1], "list") == 0) {
 Output :
 
 
+![Debugmon List](assets/debugmon_list.png)
+
 ## b. Memasang mata-mata dalam mode daemon
 Doraemon ingin agar Debugmon terus memantau user secara otomatis. Doraemon pun menjalankan program ini secara daemon dan melakukan pencatatan ke dalam file log dengan menjalankan:
 `./debugmon daemon <user>`
@@ -503,6 +505,8 @@ void write_log(const char *user) {
 Output :
 
 
+![Debugmon Daemon](assets/debugmon_daemon.png)
+
 ## c. Menghentikan pengawasan
 User mulai panik karena setiap gerak-geriknya diawasi! Dia pun memohon pada Doraemon untuk menghentikannya dengan:
 `./debugmon stop <user>`
@@ -543,6 +547,9 @@ else if (strcmp(argv[1], "stop") == 0) {
 - Mencatat operasi stop ke log dengan status `RUNNING`
   
 Output :
+
+
+![Debugmon Stop](assets/debugmon_stop.png)
 
 
 ## d. Menggagalkan semua proses user yang sedang berjalan
@@ -671,6 +678,8 @@ void run_fail_daemon(const char *user) {
 Output :
 
 
+![Debugmon Fail](assets/debugmon_fail.png)
+
 ## e. Mengizinkan user untuk kembali menjalankan proses
 Karena kasihan, Shizuka meminta Doraemon untuk memperbaiki semuanya. Doraemon pun menjalankan:
 `./debugmon revert <user>`
@@ -700,6 +709,9 @@ else if (strcmp(argv[1], "revert") == 0) {
 - Memberikan output dan error handling yang sesuai.
 
 Output :
+
+
+![Debugmon Revert](assets/debugmon_revert.png)
 
 
 ## f. Mencatat ke dalam file log
@@ -733,6 +745,9 @@ void write_custom_log(const char *procname, const char *status) {
 - Menulis timestamp dan status proses yang dijalankan.
   
 Output Log Activity :
+
+
+![Log Activity](assets/debugmon_log.png)
 
 
 
