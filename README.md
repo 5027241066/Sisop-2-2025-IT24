@@ -1,31 +1,44 @@
-# Table of Contents
-- Soal 1
-	- a. Downloading the Clues
-	- b. Filtering the Files
-	- c. Combine the File Content
- 	- d. Decode the file
-- Soal 2
-	- a. Download dan Unzip 
- 	- b. x
-  	- c. x
-  	- d. x
-  	- e. x
-  	- f. x
-- Soal 3
-	- a. x
-	- b. x
-	- c. x
-	- d. x
- 	- e. x
-  - g. x
-  - h. x 
-- Soal 4
-	- a. Mengetahui semua aktivitas user
- 	- b. Memasang mata-mata dalam mode daemon
-  	- c. Menghentikan pengawasan
-  	- d. Menggagalkan semua proses user yang sedang berjalan
-  	- e. Mengizinkan user untuk kembali menjalankan proses
-  	- f. Mencatat ke dalam file log
+# Laporan Resmi Praktikum Sisop Modul 2
+
+
+## Anggota Kelompok
+
+| No | Nama                   | NRP         |
+|----|------------------------|-------------|
+| 1  | Aditya Reza Daffansyah | 5027241034  |
+| 2  | Ahmad Yafi Ar Rizq     | 5027241066  |
+| 3  | Zahra Khaalishah       | 5027241070  |
+
+
+
+## Daftar Isi
+### Soal 1
+- [a. Downloading the Clues](#a-downloading-the-clues)
+- [b. Filtering the Files](#b-filtering-the-files)
+- [c. Combine the File Content](#c-combine-the-file-content)
+- [d. Decode the file](#d-decode-the-file)
+- [e. Password Check](#e-password-check)
+  
+### Soal 2
+- [a. Download dan Unzip](#a-download-dan-unzip) 
+- [b. Mendecrypt file pada direktori karantina](#b-mendecrypt-file-pada-direktori-karantina) 
+- [c. Memindahkan file ke direktori karantina](#c-memindahkan-file-ke-direktori-karantina) 
+- [d. Menghapus seluruh file pada direktori karantina](#d-menghapus-seluruh-file-pada-direktori-karantina)
+- [e. Mematikan program decrypt dengan PID nya](#e-mematikan-program-decrypt-dengan-pid-nya)
+- [f. Membuat error handling](#f-membuat-error-handling)
+- [g. Mencatat log activity program](#g-mencatat-log-activity-program)
+ 
+### Soal 3
+- [a. Malware yang mengganti nama menjadi /init](#a-malware-yang-mengganti-nama-menjadi-init)
+   
+### Soal 4
+- [a. Mengetahui semua aktivitas user](#a-mengetahui-semua-aktivitas-user)
+- [b. Memasang mata mata dalam mode daemon](#b-memasang-mata-mata-dalam-mode-daemon)
+- [c. Menghentikan pengawasan](#c-menghentikan-pengawasan)
+- [d. Menggagalkan semua proses user yang sedang berjalan](#d-menggagalkan-semua-proses-user-yang-sedang-berjalan)
+- [e. Mengizinkan user untuk kembali menjalankan proses](#e-mengizinkan-user-untuk-kembali-menjalankan-proses)
+- [f. Mencatat ke dalam file log](#f-mencatat-ke-dalam-file-log)
+
 
 # Soal 1
 ## a. Downloading the Clues
@@ -275,7 +288,7 @@ Setelah mendapatkan hasil dari Decoded.txt, selanjutnya output dimasukkan kedala
 ![image](https://github.com/user-attachments/assets/64b30716-0f6d-41e1-9595-bfb2d40b7522)
 
 
-## Error Handling
+### Error Handling
 ### Download Error
 ![image](https://github.com/user-attachments/assets/81705998-25b8-465a-9ff3-8810f967ec98)
 
@@ -312,9 +325,81 @@ else {
     }
 ```
 
+# Soal 2
+## a. Download dan Unzip
+## b. Mendecrypt file pada direktori karantina
+## c. Memindahkan file ke direktori karantina
+## d. Menghapus seluruh file pada direktori karantina
+## e. Mematikan program decrypt dengan PID nya
+## f. Membuat error handling
+## g. Mencatat log activity program
+
+
+# Soal 3
+## a. Malware yang mengganti nama menjadi /init
+
+### Revisi :
+```
+#define _GNU_SOURCE
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
+#include <sys/prctl.h>
+
+// Fungsi buat jadi daemon
+void jadi_daemon() {
+    pid_t pid = fork(); // Membuat proses baru
+
+    if (pid < 0) exit(EXIT_FAILURE); // Gagal fork
+    if (pid > 0) exit(EXIT_SUCCESS); // Keluar dari parent
+
+    // Jadi session leader
+    setsid();
+
+    // Fork lagi biar nggak dapet terminal
+    pid = fork();
+    if (pid < 0) exit(EXIT_FAILURE);
+    if (pid > 0) exit(EXIT_SUCCESS);
+
+    // Ganti direktori kerja ke /
+    chdir("/");
+
+    // Tutup input/output terminal
+    close(STDIN_FILENO);
+    close(STDOUT_FILENO);
+    close(STDERR_FILENO);
+}
+
+int main(int argc, char *argv[]) {
+    jadi_daemon(); // Jalanin fungsi daemon
+
+    // Ganti nama proses di sistem (misalnya terlihat /init)
+    prctl(PR_SET_NAME, "/init", 0, 0, 0);
+
+    // Ganti juga argv[0], supaya kalau orang lihat ps/top, namanya juga /init
+    char *nama_asli = argv[0];
+    int panjang = 0;
+    for (int i = 0; i < argc; i++) {
+        panjang += strlen(argv[i]) + 1;
+    }
+
+    memset(nama_asli, 0, panjang);           // Hapus nama asli
+    strncpy(nama_asli, "/init", panjang - 1); // Tulis nama palsu
+
+    // Proses tetap hidup selamanya
+    while (1) {
+        sleep(60); // Tidur tiap 1 menit
+    }
+
+    return 0;
+}
+```
+
 
 # Soal 4 
 Suatu hari, Nobita menemukan sebuah alat aneh di laci mejanya. Alat ini berbentuk robot kecil dengan mata besar yang selalu berkedip-kedip. Doraemon berkata, "Ini adalah Debugmon! Robot super kepo yang bisa memantau semua aktivitas di komputer!" Namun, alat ini harus digunakan dengan hati-hati. Jika dipakai sembarangan, bisa-bisa komputer Nobita malah error total! 
+
 ## a. Mengetahui semua aktivitas user
 Doraemon ingin melihat apa saja yang sedang dijalankan user di komputernya. Maka, dia mengetik:
 `./debugmon list <user>`
@@ -339,28 +424,316 @@ else if (strcmp(argv[1], "list") == 0) {
     write_custom_log("list", "RUNNING");
 }
 ```
-- 
+
+- Fungsi ini digunakan untuk menampilkan semua proses yang sedang berjalan oleh user tertentu.
+- Menggunakan perintah `ps` dengan opsi khusus untuk menampilkan PID, command, CPU usage, dan memory usage.
+- Menuliskan log program list dengan status `RUNNING`.
+- Memanfaatkan `fork()` dan `execvp()` untuk menjalankan `ps`.
+
+Output :
+
 
 ## b. Memasang mata-mata dalam mode daemon
 Doraemon ingin agar Debugmon terus memantau user secara otomatis. Doraemon pun menjalankan program ini secara daemon dan melakukan pencatatan ke dalam file log dengan menjalankan:
 `./debugmon daemon <user>`
 
+```
+else if (strcmp(argv[1], "daemon") == 0) {
+    char pidfile[64];
+    snprintf(pidfile, sizeof(pidfile), "debugmon_%s.pid", argv[2]);
+    FILE *pf_check = fopen(pidfile, "r");
+    if (pf_check) {
+        int existing_pid;
+        if (fscanf(pf_check, "%d", &existing_pid) == 1) {
+            if (kill(existing_pid, 0) == 0) {
+                printf("Daemon for user %s is already running with PID %d.\n", argv[2], existing_pid);
+                fclose(pf_check);
+                return 1;
+            }
+        }
+        fclose(pf_check);
+        remove(pidfile);
+    }
+
+    pid_t pid = fork();
+    if (pid > 0) {
+        printf("Daemon started.\n");
+        exit(0);
+    }
+    if (pid < 0) {
+        perror("Failed to fork for daemon");
+        exit(1);
+    }
+
+    setsid();
+
+    FILE *pf = fopen(pidfile, "w");
+    if (pf) {
+        fprintf(pf, "%d", getpid());
+        fclose(pf);
+    } else {
+        perror("Failed to write PID file");
+    }
+
+    write_custom_log("daemon", "RUNNING");
+    write_log(argv[2]);
+}
+
+void write_log(const char *user) {
+    while (1) {
+        char failfile[64];
+        snprintf(failfile, sizeof(failfile), "fail_%s.flag", user);
+        if (access(failfile, F_OK) == 0) {
+            write_custom_log("daemon", "FAILED");
+        } else {
+            write_custom_log("daemon", "RUNNING");
+        }
+        sleep(5);
+    }
+}
+```
+
+- Membuat proses daemon yang berjalan di background untuk memantau user.
+- Mengecek apakah daemon sudah berjalan dengan melihat file PID.
+- Menggunakan `fork()` dan `setsid()` untuk membuat proses daemon.
+- Menyimpan PID daemon ke file untuk referensi.
+- Menjalankan fungsi `write_log()` yang terus menulis status ke log file setiap 5 detik.
+- Menuliskan log program list dengan status `RUNNING`, kecuali dalam status fail, maka akan ditulis dengan status `FAILED`.
+
+Output :
+
+
 ## c. Menghentikan pengawasan
 User mulai panik karena setiap gerak-geriknya diawasi! Dia pun memohon pada Doraemon untuk menghentikannya dengan:
 `./debugmon stop <user>`
+
+```
+else if (strcmp(argv[1], "stop") == 0) {
+    char pidfile[64];
+    snprintf(pidfile, sizeof(pidfile), "debugmon_%s.pid", argv[2]);
+
+    FILE *pf = fopen(pidfile, "r");
+    if (!pf) {
+        printf("No running daemon for user %s.\n", argv[2]);
+        return 1;
+    }
+
+    int daemon_pid;
+    if (fscanf(pf, "%d", &daemon_pid) != 1) {
+        fclose(pf);
+        printf("Failed to read daemon PID.\n");
+        return 1;
+    }
+    fclose(pf);
+
+    if (kill(daemon_pid, SIGTERM) == 0) {
+        printf("Daemon for user %s stopped.\n", argv[2]);
+        remove(pidfile);
+        write_custom_log("stop", "RUNNING");
+    } else {
+        perror("Failed to stop daemon");
+    }
+}
+```
+
+- Menghentikan proses daemon yang sedang berjalan
+- Membaca PID daemon dari file yang dibuat saat daemon dijalankan
+- Mengirim sinyal SIGTERM untuk menghentikan daemon
+- Menghapus file PID setelah daemon berhenti
+- Mencatat operasi stop ke log dengan status `RUNNING`
+  
+Output :
+
 
 ## d. Menggagalkan semua proses user yang sedang berjalan
 Doraemon yang iseng ingin mengerjai user dengan mengetik:
 `./debugmon fail <user>`
 . Debugmon langsung menggagalkan semua proses yang sedang berjalan dan menulis status proses ke dalam file log dengan status FAILED. Selain menggagalkan, user juga tidak bisa menjalankan proses lain dalam mode ini.
 
+```
+else if (strcmp(argv[1], "fail") == 0) {
+    if (getuid() == 0) {
+        printf("Error: 'fail' command is not allowed for root user.\n");
+        return 1;
+    }
+
+    struct passwd *pw = getpwuid(getuid());
+    if (!pw) {
+        perror("Failed to get current user information");
+        return 1;
+    }
+    if (strcmp(pw->pw_name, argv[2]) != 0) {
+        printf("Error: 'fail' command can only target the current user (%s).\n", pw->pw_name);
+        return 1;
+    }
+
+    pid_t current_pid = getpid();
+
+    pid_t pid = fork();
+    if (pid == 0) {
+        FILE *ps = popen("ps -u $(whoami) -o pid --no-headers", "r");
+        if (!ps) {
+            perror("Failed to run ps in fail");
+            exit(1);
+        }
+
+        char line[256];
+        while (fgets(line, sizeof(line), ps)) {
+            int pid_to_kill = atoi(line);
+            if (pid_to_kill > 0 && pid_to_kill != current_pid) {
+                kill(pid_to_kill, SIGTERM);
+            }
+        }
+        pclose(ps);
+        exit(0);
+    } else if (pid < 0) {
+        perror("Failed to fork for killing in fail");
+    }
+    wait(NULL);
+
+    char failfile[64];
+    snprintf(failfile, sizeof(failfile), "fail_%s.flag", argv[2]);
+    FILE *ff = fopen(failfile, "w");
+    if (ff) {
+        fprintf(ff, "User %s is blocked.\n", argv[2]);
+        fclose(ff);
+    } else {
+        perror("Failed to create fail flag file");
+    }
+
+    write_custom_log("fail", "FAILED");
+    printf("User %s failed. Blocked from running processes.\n", argv[2]);
+
+    run_fail_daemon(argv[2]);
+}
+
+void run_fail_daemon(const char *user) {
+    pid_t pid = fork();
+    if (pid > 0) return;
+    if (pid < 0) {
+        perror("Failed to fork in run_fail_daemon");
+        exit(1);
+    }
+
+    setsid();
+
+    char failfile[64];
+    snprintf(failfile, sizeof(failfile), "fail_%s.flag", user);
+
+    while (1) {
+        if (access(failfile, F_OK) == 0) {
+            pid_t kill_pid = fork();
+            if (kill_pid == 0) {
+                FILE *ps = popen("ps -u $(whoami) -o pid --no-headers", "r");
+                if (!ps) {
+                    perror("Failed to run ps in run_fail_daemon");
+                    exit(1);
+                }
+
+                char line[256];
+                while (fgets(line, sizeof(line), ps)) {
+                    int pid_to_kill = atoi(line);
+                    if (pid_to_kill <= 0) continue;
+
+                    char proc_path[256];
+                    snprintf(proc_path, sizeof(proc_path), "/proc/%d/comm", pid_to_kill);
+                    FILE *comm_file = fopen(proc_path, "r");
+                    if (!comm_file) continue;
+
+                    char comm[256];
+                    if (fgets(comm, sizeof(comm), comm_file)) {
+                        comm[strcspn(comm, "\n")] = 0;
+                        if (strcmp(comm, "debugmon") != 0) {
+                            kill(pid_to_kill, SIGTERM);
+                        }
+                    }
+                    fclose(comm_file);
+                }
+                pclose(ps);
+                exit(0);
+            } else if (kill_pid < 0) {
+                perror("Failed to fork for killing in run_fail_daemon");
+            }
+            wait(NULL);
+        }
+        sleep(5);
+    }
+}
+``` 
+
+- Mengentikan semua proses yang sedang berjalan oleh user tertentu.
+- Membuat file flag untuk menandai bahwa user dalam status `FAILED`.
+- Mencatat ke log dengan status `FAILED`.
+- Menjalankan daemon `run_fail_daemon` yang akan memantau dan menghentikan proses baru.
+- Menghentikan proses selain dari proses `debugmon` yang dipantau setiap 5 detik.
+- Menargetkan fail untuk proses dari user. (root tidak diizinkan untuk mengeksekusi fungsi `fail`).
+
+Output :
+
+
 ## e. Mengizinkan user untuk kembali menjalankan proses
 Karena kasihan, Shizuka meminta Doraemon untuk memperbaiki semuanya. Doraemon pun menjalankan:
 `./debugmon revert <user>`
 . Debugmon kembali ke mode normal dan bisa menjalankan proses lain seperti biasa.
 
+```
+else if (strcmp(argv[1], "revert") == 0) {
+    char failfile[64];
+    snprintf(failfile, sizeof(failfile), "fail_%s.flag", argv[2]);
+
+    if (access(failfile, F_OK) == 0) {
+        if (remove(failfile) != 0) {
+            perror("Failed to remove fail flag file");
+        } else {
+            write_custom_log("revert", "RUNNING");
+            printf("User %s unblocked.\n", argv[2]);
+        }
+    } else {
+        printf("User %s is not blocked.\n", argv[2]);
+    }
+}
+```
+
+- Mengembalikan proses seperti semula (menghilangkan fungsi `fail`)
+- Menghapus file flag yang dihasilkan fungsi `fail`.
+- Kembali mencatat log aktivitas dengan status `RUNNING`
+- Memberikan output dan error handling yang sesuai.
+
+Output :
+
+
 ## f. Mencatat ke dalam file log
 Sebagai dokumentasi untuk mengetahui apa saja yang debugmon lakukan di komputer user, debugmon melakukan pencatatan dan penyimpanan ke dalam file debugmon.log untuk semua proses yang dijalankan dengan format
 [dd:mm:yyyy]-[hh:mm:ss]_nama-process_STATUS(RUNNING/FAILED)
 Untuk poin b, c, dan e, status proses adalah RUNNING. Sedangkan untuk poin d, status proses adalah FAILED.
+
+```
+void write_custom_log(const char *procname, const char *status) {
+    FILE *log = fopen("debugmon.log", "a");
+    if (!log) {
+        perror("Failed to open debugmon.log");
+        return;
+    }
+
+    time_t t = time(NULL);
+    struct tm tm = *localtime(&t);
+
+    fprintf(log, "[%02d:%02d:%d]-[%02d:%02d:%02d]_%s_%s\n",
+            tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900,
+            tm.tm_hour, tm.tm_min, tm.tm_sec,
+            procname, status);
+
+    fclose(log);
+}
+```
+
+- Fungsi utilitas untuk mencatat log aktivitas program `debugmon`.
+- Memastikan untuk mengikuti constraits dari soal yaitu format `[dd:mm:yyyy]-[hh:mm:ss]_processname_STATUS`
+- Membuka file dalam mode append untuk menambah input baru.
+- Menulis timestamp dan status proses yang dijalankan.
+  
+Output Log Activity :
+
+
+
 
