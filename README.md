@@ -276,6 +276,20 @@ Setelah mendapatkan hasil dari Decoded.txt, selanjutnya output dimasukkan kedala
 
 
 ## Error Handling
+### Download Error
+![image](https://github.com/user-attachments/assets/81705998-25b8-465a-9ff3-8810f967ec98)
+
+Error disebabkan oleh code shell dalam file c.
+Solution:
+```
+system("wget --no-check-certificate 'https://drive.usercontent.google.com/u/0/uc?id=1xFn1OBJUuSdnApDseEczKhtNzyGekauK&export=download' -O Clues.zip");
+system("unzip Clues.zip");
+system("rm Clues.zip");
+```
+Menambahkan `system` agar code bisa berjalan.
+
+### Larangan System
+Karena ada larangan menggunakan system, saya mengubah code yang sebelumnya menggunakan `system()` menjadi menggunakan `execve(curl)` `execve(unzip)` `execve(rm)`
 
 ## Revisi
 ### Download
