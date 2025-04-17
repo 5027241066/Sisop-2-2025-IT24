@@ -395,7 +395,38 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 ```
+`void jadi_daemon()` 
+Membuat code berjalan secara deamon.
 
+```pid_t pid = fork();```
+Proses pertama menggunakan `fork()` untuk membuat proses baru. Jika `fork()` gagal, maka proses dihentikan dengan `exit(EXIT_FAILURE)`.
+
+`chdir("/");` Berfungsi untuk mengubah direktori ke '/'
+
+```
+close(STDIN_FILENO);
+close(STDOUT_FILENO);
+close(STDERR_FILENO);
+```
+Code berikut membuat setelah menjadi daemon, stdin, stdout, dan stderr ditutup. Ini untuk memastikan bahwa proses tidak lagi terhubung dengan terminal atau file yang tidak diinginkan.
+
+```prctl(PR_SET_NAME, "/init", 0, 0, 0);```
+```
+char *nama_asli = argv[0];
+int panjang = 0;
+for (int i = 0; i < argc; i++) {
+    panjang += strlen(argv[i]) + 1;
+}
+memset(nama_asli, 0, panjang);
+strncpy(nama_asli, "/init", panjang - 1);
+```
+Dengan code ini code akan berjalan dan saat ps aux akan terlihat dengan nama '/init'.
+
+`while (1) {
+    sleep(60);
+}
+` 
+Code ini akan membuat process tetap berjalan terus-menerus. 
 
 # Soal 4 
 Suatu hari, Nobita menemukan sebuah alat aneh di laci mejanya. Alat ini berbentuk robot kecil dengan mata besar yang selalu berkedip-kedip. Doraemon berkata, "Ini adalah Debugmon! Robot super kepo yang bisa memantau semua aktivitas di komputer!" Namun, alat ini harus digunakan dengan hati-hati. Jika dipakai sembarangan, bisa-bisa komputer Nobita malah error total! 
