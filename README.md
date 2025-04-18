@@ -326,15 +326,6 @@ else {
 ```
 
 # Soal 2
-## a. Download dan Unzip
-## b. Mendecrypt file pada direktori karantina
-## c. Memindahkan file ke direktori karantina
-## d. Menghapus seluruh file pada direktori karantina
-## e. Mematikan program decrypt dengan PID nya
-## f. Membuat error handling
-## g. Mencatat log activity program
----
-
 
 ## 🧾 Deskripsi 
 
@@ -342,7 +333,153 @@ Program `starterkit` ini dibuat untuk membantu Kanade dan tim N25 dalam menangan
 
 ---
 
-## 💻 Source Code Lengkap dengan Penjelasan
+## 📁 Struktur Direktori
+
+```
+soal_2/
+├── activity.log         # Log aktivitas program
+├── quarantine/          # Direktori karantina
+├── starter_kit/         # Direktori awal file yang di-unzip
+├── starterkit           # File executable
+└── starterkit.c         # Source code
+```
+
+## a. Download dan Unzip
+
+**Command:**
+```bash
+wget <link_file_zip> -O starterkit.zip
+unzip starterkit.zip -d starter_kit/
+rm starterkit.zip
+```
+
+**Cara Kerja:**
+Program mengunduh file zip dari internet, mengekstraknya ke direktori `starter_kit/`, dan menghapus file zip-nya agar tidak menumpuk. File yang diekstrak nantinya akan dipindahkan ke karantina.
+- Pastikan `starter_kit/` sudah ada, atau script buat otomatis.
+- Jika link mati atau tidak valid, `wget` akan gagal.
+
+---
+
+## b. Mendecrypt file pada direktori karantina
+
+**Command:**
+```bash
+./starterkit --decrypt
+```
+
+**Cara Kerja:**
+Program menjalankan proses daemon di background yang:
+- Mengecek isi direktori `quarantine/` setiap 10 detik.
+- Mendekripsi nama file yang sebelumnya terenkripsi (dalam Base64).
+- Rename nama file hasil decoding.
+
+**Log Aktivitas:**
+```
+[dd-mm-yyyy][HH:MM:SS] - Successfully started decryption process with PID <pid>.
+```
+
+**Kendala:**
+- Pastikan `libssl-dev` terpasang saat kompilasi.
+- File dengan nama bukan Base64 bisa gagal didecode, tapi program tetap lanjut.
+
+---
+
+## c. Memindahkan file ke direktori karantina
+
+**Command:**
+```bash
+./starterkit --quarantine
+```
+
+**Cara Kerja:**
+Program membaca semua file di `starter_kit/`, lalu memindahkannya ke `quarantine/` menggunakan fungsi `rename()`. Nama file tidak diubah.
+
+**Log Aktivitas:**
+```
+[dd-mm-yyyy][HH:MM:SS] - <nama file> - Successfully moved to quarantine directory.
+```
+
+**Kendala:**
+- Direktori `starter_kit/` harus berisi file.
+- Tidak ada file yang dipindah jika kosong.
+
+---
+
+## d. Menghapus seluruh file pada direktori karantina
+
+**Command:**
+```bash
+./starterkit --eradicate
+```
+
+**Cara Kerja:**
+Program menghapus seluruh file dalam `quarantine/` menggunakan fungsi `remove()`. Setiap penghapusan dicatat dalam log.
+
+**Log Aktivitas:**
+```
+[dd-mm-yyyy][HH:MM:SS] - <nama file> - Successfully deleted.
+```
+
+**Kendala:**
+- Tidak ada file yang dihapus jika direktori kosong.
+
+---
+
+## e. Mematikan program decrypt dengan PID nya
+
+**Command:**
+```bash
+./starterkit --shutdown
+```
+
+**Cara Kerja:**
+Program membaca file `.pid` yang menyimpan PID proses daemon, lalu mengirimkan sinyal `SIGTERM` untuk mematikan proses tersebut.
+
+**Log Aktivitas:**
+```
+[dd-mm-yyyy][HH:MM:SS] - Successfully shut off decryption process with PID <pid>.
+```
+
+**Kendala:**
+- File `.pid` tidak ditemukan jika daemon belum pernah dijalankan.
+- Jika proses dengan PID tersebut tidak aktif, akan gagal menghentikan.
+
+---
+
+## f. Membuat error handling
+
+**Command Salah:**
+```bash
+./starterkit --salah
+```
+
+**Output:**
+```
+Invalid option: --salah
+```
+
+**Cara Kerja:**
+Program memvalidasi argumen. Jika tidak cocok dengan kelima opsi, akan invalid
+
+---
+
+## g. Mencatat log activity program
+
+Semua aktivitas dicatat ke dalam file `activity.log` dalam format:
+
+```
+[dd-mm-yyyy][HH:MM:SS] - <deskripsi aktivitas>
+```
+
+log:
+```
+[18-04-2025][14:33:20] - fileA.txt - Successfully moved to quarantine directory.
+[18-04-2025][14:33:30] - Successfully shut off decryption process with PID 12345.
+```
+
+---
+
+## 💻 Source Code 
 
 ```
 // Import library yang dibutuhkan
@@ -510,7 +647,7 @@ void decrypt_daemon() {
         exit(0);
     }
 
-    setsid(); // detach
+    setsid(); 
     chdir("/");
     fclose(stdin);
     fclose(stdout);
@@ -611,160 +748,8 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
-```
-## 📁 Struktur Direktori
 
 ```
-soal_2/
-├── activity.log         # Log aktivitas program
-├── quarantine/          # Direktori karantina
-├── starter_kit/         # Direktori awal file yang di-unzip
-├── starterkit           # File executable
-└── starterkit.c         # Source code
-```
-
----
-
-## a. 📦 Download dan Unzip Starter Kit
-
-**Command:**
-```bash
-wget <link_file_zip> -O starterkit.zip
-unzip starterkit.zip -d starter_kit/
-rm starterkit.zip
-```
-
-**Cara Kerja:**
-Program mengunduh file zip dari internet, mengekstraknya ke direktori `starter_kit/`, dan menghapus file zip-nya agar tidak menumpuk. File yang diekstrak nantinya akan dipindahkan ke karantina.
-- Pastikan `starter_kit/` sudah ada, atau script buat otomatis.
-- Jika link mati atau tidak valid, `wget` akan gagal.
-
----
-
-## b. 🔐 Mendecrypt File pada Direktori Karantina
-
-**Command:**
-```bash
-./starterkit --decrypt
-```
-
-**Cara Kerja:**
-Program menjalankan proses daemon di background yang:
-- Mengecek isi direktori `quarantine/` setiap 10 detik.
-- Mendekripsi nama file yang sebelumnya terenkripsi (dalam Base64).
-- Rename nama file hasil decoding.
-
-**Log Aktivitas:**
-```
-[dd-mm-yyyy][HH:MM:SS] - Successfully started decryption process with PID <pid>.
-```
-
-**Kendala:**
-- Pastikan `libssl-dev` terpasang saat kompilasi.
-- File dengan nama bukan Base64 bisa gagal didecode, tapi program tetap lanjut.
-
----
-
-## c. 📂 Memindahkan File ke Direktori Karantina
-
-**Command:**
-```bash
-./starterkit --quarantine
-```
-
-**Cara Kerja:**
-Program membaca semua file di `starter_kit/`, lalu memindahkannya ke `quarantine/` menggunakan fungsi `rename()`. Nama file tidak diubah.
-
-**Log Aktivitas:**
-```
-[dd-mm-yyyy][HH:MM:SS] - <nama file> - Successfully moved to quarantine directory.
-```
-
-**Kendala:**
-- Direktori `starter_kit/` harus berisi file.
-- Tidak ada file yang dipindah jika kosong.
-
----
-
-## d. 🗑️ Menghapus Seluruh File pada Direktori Karantina
-
-**Command:**
-```bash
-./starterkit --eradicate
-```
-
-**Cara Kerja:**
-Program menghapus seluruh file dalam `quarantine/` menggunakan fungsi `remove()`. Setiap penghapusan dicatat dalam log.
-
-**Log Aktivitas:**
-```
-[dd-mm-yyyy][HH:MM:SS] - <nama file> - Successfully deleted.
-```
-
-**Kendala:**
-- Tidak ada file yang dihapus jika direktori kosong.
-
----
-
-## e. ❌ Mematikan Program Decrypt dengan PID
-
-**Command:**
-```bash
-./starterkit --shutdown
-```
-
-**Cara Kerja:**
-Program membaca file `.pid` yang menyimpan PID proses daemon, lalu mengirimkan sinyal `SIGTERM` untuk mematikan proses tersebut.
-
-**Log Aktivitas:**
-```
-[dd-mm-yyyy][HH:MM:SS] - Successfully shut off decryption process with PID <pid>.
-```
-
-**Kendala:**
-- File `.pid` tidak ditemukan jika daemon belum pernah dijalankan.
-- Jika proses dengan PID tersebut tidak aktif, akan gagal menghentikan.
-
----
-
-## f. ⚠️ Error Handling
-
-**Command Salah:**
-```bash
-./starterkit --salah
-```
-
-**Output:**
-```
-Usage:
-  ./starterkit --decrypt
-  ./starterkit --quarantine
-  ./starterkit --return
-  ./starterkit --eradicate
-  ./starterkit --shutdown
-```
-
-**Cara Kerja:**
-Program memvalidasi argumen. Jika tidak cocok dengan kelima opsi, akan menampilkan petunjuk penggunaan.
-
----
-
-## g. 📜 Log Aktivitas Program
-
-Semua aktivitas dicatat ke dalam file `activity.log` dalam format:
-
-```
-[dd-mm-yyyy][HH:MM:SS] - <deskripsi aktivitas>
-```
-
-log:
-```
-[18-04-2025][14:33:20] - fileA.txt - Successfully moved to quarantine directory.
-[18-04-2025][14:33:30] - Successfully shut off decryption process with PID 12345.
-```
-
----
-
 
 # Soal 3
 ## a. Malware yang mengganti nama menjadi /init
